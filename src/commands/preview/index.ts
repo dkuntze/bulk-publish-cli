@@ -8,6 +8,13 @@ import Publish from './publish.js';
 
 const results: string[] = [];
 
+function changeExtensionToJSON(filePath: string): string {
+    let parsedPath = path.parse(filePath);
+    parsedPath.ext = '.json';
+    parsedPath.base = `${parsedPath.name}${parsedPath.ext}`;
+    return path.format(parsedPath);
+}
+
 export default class Preview extends Command {
 
     static args = {
@@ -89,7 +96,7 @@ export default class Preview extends Command {
                     // await this.startJob(JSON.stringify(paths, null, 4));
                     ux.action.start('Writing JSON');
 
-                    fse.writeFile('/Users/dkuntze/Desktop/import-articles-cli.json', JSON.stringify(paths, null, 4), (error) => {
+                    fse.writeFile(changeExtensionToJSON(args.csv), JSON.stringify(paths, null, 4), (error) => {
                         if (error) {
                             this.log(error.message);
                             throw error;

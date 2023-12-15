@@ -45,7 +45,7 @@ FLAGS
   -w, --write (optional) write a json body file
 
 DESCRIPTION
-  Preview the list from the csv and create admin preview jobs
+  Preview the list from the csv and create admin preview jobs. If the -w flag is passed, a json file will be written parallel to the csv of the same name.
 
 EXAMPLES
   $ bpc preview ./myfile.csv -f
