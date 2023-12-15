@@ -4,12 +4,13 @@ import * as fse from "fs";
 import * as path from 'node:path'
 import stripBomStream from "strip-bom-stream";
 
+import Utils from "../../utils.js";
 import Publish from './publish.js';
 
 const results: string[] = [];
 
 function changeExtensionToJSON(filePath: string): string {
-    let parsedPath = path.parse(filePath);
+    const parsedPath = path.parse(filePath);
     parsedPath.ext = '.json';
     parsedPath.base = `${parsedPath.name}${parsedPath.ext}`;
     return path.format(parsedPath);
@@ -28,10 +29,12 @@ export default class Preview extends Command {
 
     async run(): Promise<any> {
         let accessToken: string;
+        let repoPath: string;
         const {args, flags} = await this.parse(Preview);
         fse.readFile(path.join(this.config.configDir, '/config.json'), 'utf8', (error, data) => {
             const userConfig = JSON.parse(data);
             accessToken = userConfig.token;
+            repoPath = Utils.getRepoPath(userConfig.GitHub);
         });
 
         ux.action.start('Parsing CSV');
@@ -84,7 +87,7 @@ export default class Preview extends Command {
 
                     // const runNum = await publish.testJob(JSON.stringify(payload), 'preview');
                     // console.log(runNum);
-                    const jobStatus = await publish.startJob(JSON.stringify(payload), 'preview', accessToken);
+                    const jobStatus = await publish.startJob(JSON.stringify(payload), 'preview', accessToken, repoPath);
                     console.log(jobStatus);
                     if (jobStatus ==='Unauthorized') {
                         break;

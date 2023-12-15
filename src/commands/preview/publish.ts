@@ -6,7 +6,7 @@ let counter = 0;
 
 export default class Publish  {
 
-    async startJob(paths: string, env: string, accessToken: string): Promise<string> {
+    async startJob(paths: string, env: string, accessToken: string, repoPath: string): Promise<string> {
 
         const options = {
             body: paths,
@@ -18,7 +18,7 @@ export default class Publish  {
         };
 
         const state = new State();
-        const response = await fetch(`https://admin.hlx.page/${env}/revolttv/helix-revolt-tv/main/*`, options);
+        const response = await fetch(`https://admin.hlx.page/${env}${repoPath}/*`, options);
 
         if (response.ok) {
             const data = await response.json();
@@ -26,10 +26,11 @@ export default class Publish  {
             counter++;
             console.log(`JOB: ${counter} - ${rStatus.link.self}`);
             return state.checkStatus(rStatus.link.self, accessToken);
-        } else {
+        }
+
             console.log(`Error: ${response.status} - ${response.statusText}`);
             return response.statusText;
-        }
+
     }
 
     async testJob(pbody: string, env: string): Promise<{ test: string }> {
@@ -41,7 +42,7 @@ export default class Publish  {
     async testNested(num:number) {
         console.log(`test nest - ${num}`);
         num++;
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => {setTimeout(resolve, 1000)});
         if (num < 10) {
             await this.testNested(num);
         }
