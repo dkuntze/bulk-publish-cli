@@ -44,8 +44,8 @@
   "main": "",
   "name": "bulk-publish-cli",
   "oclif": {
-    "bin": "bpc",
-    "dirname": "bpc",
+    "bin": "bpublish",
+    "dirname": "bpublish",
     "commands": "./dist/commands",
     "plugins": [
       "@oclif/plugin-help",

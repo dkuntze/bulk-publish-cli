@@ -24,7 +24,7 @@ export default class Preview extends Command {
 
     static flags = {
         force: Flags.boolean({char: 'f', default: false, description: 'Force update', required: false}),
-        write: Flags.boolean({char: 'w', default: false, description: 'Write JSON file', required: false}),
+        write: Flags.boolean({char: 'w', default: false, description: 'Write JSON file', required: false})
     }
 
     async run(): Promise<any> {
