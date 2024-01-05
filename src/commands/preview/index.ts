@@ -24,7 +24,16 @@ export default class Preview extends Command {
 
     static flags = {
         force: Flags.boolean({char: 'f', default: false, description: 'Force update', required: false}),
-        write: Flags.boolean({char: 'w', default: false, description: 'Write JSON file', required: false})
+        write: Flags.boolean({char: 'w', default: false, description: 'Write JSON file', required: false}),
+        remove: Flags.string({
+            noCacheDefault: false,
+            deprecateAliases: false,
+            char: 'r',
+            summary: 'remove the hostname from the request. bulk jobs can only have relative paths',
+            description: 'Remove hostname',
+            required: false,
+            hidden: false,
+        })
     }
 
     async run(): Promise<any> {
@@ -38,11 +47,14 @@ export default class Preview extends Command {
         });
 
         ux.action.start('Parsing CSV');
+
         fse.createReadStream(args.csv)
             .pipe(stripBomStream())
             .pipe(csv.default(['path']))
             .on('data', (data: { path: string; }) => {
-                results.push(data.path.replace('https://www.revolt.tv','').replace(/\/+$/,''));
+                if (flags.remove) {
+                    results.push(data.path.replace(flags.remove,'').replace(/\/+$/,''));
+                }
             })
             .on('end', async () => {
                 results.shift(); // get rid of the "Path" header at the beginning
@@ -53,7 +65,7 @@ export default class Preview extends Command {
 
                 ux.action.stop();
 
-                const MAX_BLOCK_SIZE = 3500;
+                const MAX_BLOCK_SIZE = 1500;
                 const NUM_BLOCKS = Math.round(results.length / MAX_BLOCK_SIZE);
 
                 let BLOCKS = [];
@@ -74,11 +86,10 @@ export default class Preview extends Command {
                 }
 
                 // for testing - shorten the array
-                BLOCKS = BLOCKS.slice(0, 2);
+                //BLOCKS = BLOCKS.slice(0, 2);
 
 
                 for await (const element of BLOCKS) {
-                    let stopNow = false;
                     const publish = new Publish();
                     const payload = {
                         'forceUpdate': flags.force,
